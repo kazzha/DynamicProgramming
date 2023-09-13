@@ -1,7 +1,10 @@
 #pragma once
 
+// dynamicProgramming ∞≥≥‰
+
 #include <iostream>
 #include <map>
+#include <string>
 
 // TC: √— ≥ÎµÂ¿« ∞≥ºˆ 2^n
 // SC: ≥Ù¿Ã
@@ -53,3 +56,34 @@ int FindWay(int m, int n)
 
 	return FindWay(m - 1, n) + FindWay(n - 1, m);
 }
+
+// TC: O(n) / O(m * n)
+// SC: O(m+n)
+
+int FindWay(int m, int n, std::map<std::string, int>& memo)
+{
+	std::string key = std::to_string(m) + std::to_string(n);
+
+	if (memo.count(key) == 1)
+	{
+		return memo[key];
+	}
+
+	std::string rkey = std::to_string(n) + "," + std::to_string(m);
+	if (memo.count(rkey) == 1)
+	{
+		return memo[rkey];
+	}
+
+	if (m == 1 && n == 1)
+	{
+		return 1;
+	}
+	if (m == 0 || n == 0)
+	{
+		return 0;
+	}
+	memo[key] = FindWay(m - 1, n, memo) + FindWay(n - 1, m, memo);
+	return memo[key];
+}
+
