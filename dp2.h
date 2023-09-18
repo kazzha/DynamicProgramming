@@ -26,7 +26,7 @@ bool CanAccumulate(const std::vector<int>& numbers, int sum)
 	for (auto e : numbers)
 	{
 	    
-		if(CanAccumulate(numbers, sum - e));
+		if(CanAccumulate(numbers, sum - e))
 		{
 			return true; // 하나라도 참이면 멈춤. 빨라짐
 		}
@@ -65,7 +65,7 @@ bool CanAccumulate(const std::vector<int>& numbers, int sum, std::map<int, bool>
 	}
 
 	memo[sum] = false;
-	return false;
+	return memo[sum];
 }
 
 //Memorization
@@ -109,6 +109,168 @@ result HowAccumulate(const std::vector<int>& numbers, int sum, std::map<int, res
 	return memo[sum];
 }
 
+// TC: O( m * n )
+// std::copy 시간 고려 ( m^2 * n)
+// SC:O( m ^ 2),
 
-// 최소의 크기
+result OptimizeAccumulate(const std::vector<int>& numbers, int sum, std::map<int, result>& memo)
+{
+	if (memo.count(sum) == 1)
+	{
+		return memo[sum];
+	}
+	//base case
+	if (sum == 0)
+	{
+		return std::make_shared<std::vector<int>>();
+	}
+	if (sum < 0)
+	{
+		return nullptr;
+	}
 
+	// recursive case
+	std::shared_ptr<std::vector<int>> optimized = nullptr;
+
+	for (const auto e : numbers)
+	{
+		auto r = OptimizeAccumulate(numbers, sum - e, memo);
+
+		if (r != nullptr)
+		{
+			std::shared_ptr<std::vector<int>> v = std::make_shared<std::vector<int>>();
+			v->resize(r->size());
+			std::copy(r->begin(), r->end(), v->begin());
+
+			v->push_back(e);
+
+			if (optimized == nullptr || v->size() < optimized->size())
+			{
+				optimized = v;
+			}
+		}
+	}
+
+	memo[sum] = optimized;
+		return memo[sum];
+}
+
+//////////////////////////////////////////////////////////
+// Decision Problem - brute force
+// TC: O( m^2 * n )
+// SC:O( m ^ 2),
+bool CanGenerate(const std::vector<std::string>& strings, std::string target)
+{
+	// base case
+	if (target == "")
+	{
+		return true;
+	}
+
+	// recursive
+	for (auto e : strings)
+	{
+		if (target.find(e) == 0)
+		{
+			auto subStr = target.substr(e.size());
+			if (CanGenerate(strings, subStr))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+// Memoization
+// TC: O( m^2 * n )
+// SC:O( m ^ 2)
+
+bool CanGenerate(const std::vector<std::string>& strings, std::string target
+	, std::map<std::string, bool>& memo)
+{
+	if(memo.count(target) == 1)
+	{
+		return memo[target];
+	}
+	
+	// base case
+	if (target == "")
+	{
+		return true;
+	}
+
+	// recursive
+	for (auto e : strings)
+	{
+		if (target.find(e) == 0)
+		{
+			auto subStr = target.substr(e.size());
+			if (CanGenerate(strings, subStr))
+			{
+				memo[target] = true;
+				return memo[target];
+			}
+		}
+	}
+
+	memo[target] = false;
+	return memo[target];
+}
+
+// Combination - brute force
+// TC : O(n^m * m)
+// SC : O(m^2)
+int HowManyGenerate(const std::vector<std::string>& strings, std::string target)
+{
+	// base case
+	if (target == "")
+	{
+		return 1;
+	}
+
+	// recursive case
+	int count{};
+
+	for (auto e : strings)
+	{
+		if (target.find(e) == 0)
+		{
+			std::string subs = target.substr(e.size());
+			count += HowManyGenerate(strings, subs);
+		}
+	}
+	return count;
+}
+
+// Combination - Memoization
+// TC : O(n^m * m)
+// SC : O(m^2) 기본 스트링에 substr이 포함 되니까 m제곱
+int HowManyGenerate(const std::vector<std::string>& strings, std::string target,
+	               std::map<std::string, int>& memo)
+{
+	if (memo.count(target) == 1)
+	{
+		return memo[target];
+	}
+	// base case
+	if (target == "")
+	{
+		return 1;
+	}
+
+	// recursive case
+	int count{};
+
+	for (auto e : strings)
+	{
+		if (target.find(e) == 0)
+		{
+			std::string subs = target.substr(e.size());
+			count += HowManyGenerate(strings, subs, memo);
+		}
+	}
+	memo[target] = count;
+	return memo[target];
+}
