@@ -5,7 +5,31 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <list>
 
+
+std::ostream& operator << (std::ostream& os, std::vector<int>* v)
+{
+	if (v == nullptr)
+	{
+		std::cout << "nullptr";
+	}
+	else {
+		std::cout << "{";
+		for (int i = 0; i < v->size(); i++)
+		{
+			std::cout << (*v)[i];
+
+			if (i < v->size() - 1)
+			{
+				std::cout << ",";
+			}
+		}
+
+		std::cout << "}";
+	}
+	return os;
+}
 // Brute Force
 // TC: m-sum이고 n이 numbers의 크기일때 O( n ^ m ) ( 1이면 sum이 8일때 8번 수행)
 // SC: O( m )
@@ -273,4 +297,65 @@ int HowManyGenerate(const std::vector<std::string>& strings, std::string target,
 	}
 	memo[target] = count;
 	return memo[target];
+}
+
+using string2d = std::list<std::list<std::string>>;
+
+// TC: O(n^m * M)
+// SC: 
+string2d AllCombination(const std::vector<std::string>& strings, std::string target)
+{
+	// base case
+	if (target == "")
+	{
+		return string2d{ {} };
+
+	}
+
+	// recursive case
+	string2d v;
+	for (auto word : strings)
+	{
+		if (target.find(word) == 0)
+		{
+			auto r = AllCombination(strings, target.substr(word.size()));
+			for (auto s : r)
+			{
+				s.push_front(word);
+				v.push_front(s);
+			}
+		}
+	}
+	return v;
+}
+
+std::ostream& operator << (std::ostream& os, const string2d& v)
+{
+	std::cout << "{" << std::endl;
+	int i{},j{};
+
+	for (auto e1 : v)
+	{
+		j = 0;
+		std::cout << "    {";
+		for (auto e2 : e1)
+		{
+			std::cout << e2 ;
+			if (j < e1.size() - 1)
+			{
+				std::cout << ",";
+			}
+			j++;
+		}
+		std::cout << "}" ;
+
+		if (i < v.size() - 1) {
+			std::cout << ",";
+		}
+		std::cout << std::endl;
+		i++;
+	}
+	std::cout << "}" << std::endl;
+
+	return os;
 }

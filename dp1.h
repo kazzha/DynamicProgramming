@@ -62,7 +62,7 @@ int FindWay(int m, int n)
 
 int FindWay(int m, int n, std::map<std::string, int>& memo)
 {
-	std::string key = std::to_string(m) + std::to_string(n);
+	std::string key = std::to_string(m) + "," + std::to_string(n);
 
 	if (memo.count(key) == 1)
 	{
